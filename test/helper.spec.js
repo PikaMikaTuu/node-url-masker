@@ -38,6 +38,7 @@ describe("the cleanURL function", function() {
 
     it("should handle objects other than strings", function() {
         const numberResult = cleanURL(777);
+        const nullResult = cleanURL(null);
         const boolTrueResult = cleanURL(true);
         const boolFalseResult = cleanURL(false);
         const jsonResult = cleanURL({'name': 'Foo', 'x': [1, 2, 3]});
@@ -51,7 +52,6 @@ describe("the cleanURL function", function() {
 
 // TODO
 describe("the readJSONFile function", function() {
-
     it("should open a valid file", async function() {
         const data = await readJSONFile('./urls.json');
     });
