@@ -52,7 +52,52 @@ describe("the cleanURL function", function() {
 
 // TODO
 describe("the readJSONFile function", function() {
-    it("should open a valid file", async function() {
-        const data = await readJSONFile('./urls.json');
+    it("should open a valid file", function() {
+
+    });
+
+    it("should handle invalid file path", function() {
+
+    });
+
+    it("should handle non-JSON files", function() {
+
+    });
+
+    // recursively remove ../
+    it("should handle directory traversal", function() {
+
+    });
+});
+
+// TODO
+describe("the getURL function", function() {
+
+    it("should return a object given a valid hash", function() {
+
+    });
+
+    it("should return undefined given an invalid hash", function() {
+
+    });
+
+    it("should return undefined given undefined/null/empty string", function() {
+
+    });
+});
+
+// TODO
+describe("the writeURL function", function() {
+
+    it("should return a object given a valid (hash, url)", function() {
+
+    });
+
+    it("should return undefined given an invalid (hash, url)", function() {
+
+    });
+
+    it("should return undefined given undefined/null/empty (hash, url)", function() {
+
     });
 });

@@ -2,24 +2,24 @@ const crypto = require('crypto');
 const fs = require('fs').promises;
 const DATABASE = './urls.json';
 
-function cleanURL(url) {
+function cleanString(inputString) {
 
     // returns undefined if
-    // url is set to empty string / null / undefined / 0 / 00
+    // inputString is set to empty string / null / undefined / 0 / 00
     // OR
-    // typeof url is not a string
+    // typeof inputString is not a string
 
-    if (Boolean(url) != true || typeof url !== "string" ) {
+    if (Boolean(inputString) != true || typeof inputString !== "string" ) {
         return undefined;
     }
 
     // Trim whitespaces
-    url = url.trim();
-    return url;
+    inputString = inputString.trim();
+    return inputString;
 }
 
 function md5sum(url) {
-    url = cleanURL(url);
+    url = cleanString(url);
 
     // if not a valid URL
     if (!url)
@@ -29,20 +29,24 @@ function md5sum(url) {
     return hash;
 }
 
-// TODO
-function ifFileValidJSON(filePath) {
-    if (fs.existsSync(filePath)) {
-        return true;
-    }
-    return false;
-}
-
 async function readJSONFile(filePath) {
-    const data = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(data.toString());
+    try {
+        const data = await fs.readFile(filePath, 'utf-8');
+        return JSON.parse(data.toString());
+    }
+    catch (err) {
+        console.log('helpers.js: error in readJSONFile.', err);
+    }
 }
 
 async function writeURL(hash, url) {
+    url = cleanString(url);
+    hash = cleanString(hash);
+
+    // if not a valid URL or hash
+    if (!url || !hash)
+        return undefined;
+
     console.log(`Writing: ${hash}: ${url}`);
 
     let data = await readJSONFile(DATABASE);
@@ -54,6 +58,12 @@ async function writeURL(hash, url) {
 }
 
 async function getURL(hash) {
+    hash = cleanString(hash);
+
+    // if not a valid hash
+    if (!hash)
+        return undefined;
+
     console.log(`Getting: ${hash}`);
     let data = await readJSONFile(DATABASE);
     const url = data[hash];
@@ -61,7 +71,7 @@ async function getURL(hash) {
 }
 
 module.exports = {
-    cleanURL: cleanURL,
+    cleanString: cleanString,
     md5sum: md5sum,
     readJSONFile: readJSONFile,
     writeURL: writeURL,
