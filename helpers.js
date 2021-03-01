@@ -2,9 +2,39 @@ const crypto = require('crypto');
 const fs = require('fs').promises;
 const DATABASE = './urls.json';
 
+function cleanURL(url) {
+
+    // returns undefined if
+    // url is set to empty string / null / undefined / 0 / 00
+    // OR
+    // typeof url is not a string
+
+    if (Boolean(url) != true || typeof url !== "string" ) {
+        return undefined;
+    }
+
+    // Trim whitespaces
+    url = url.trim();
+    return url;
+}
+
 function md5sum(url) {
+    url = cleanURL(url);
+
+    // if not a valid URL
+    if (!url)
+        return undefined;
+
     const hash = crypto.createHash('md5').update(`${url}`).digest("hex");
     return hash;
+}
+
+// TODO
+function ifFileValidJSON(filePath) {
+    if (fs.existsSync(filePath)) {
+        return true;
+    }
+    return false;
 }
 
 async function readJSONFile(filePath) {
@@ -31,7 +61,9 @@ async function getURL(hash) {
 }
 
 module.exports = {
-    getURL: getURL,
+    cleanURL: cleanURL,
+    md5sum: md5sum,
+    readJSONFile: readJSONFile,
     writeURL: writeURL,
-    md5sum: md5sum
+    getURL: getURL
 }
