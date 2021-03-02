@@ -1,0 +1,84 @@
+command line nodejs - dummy url masker - express API
+
+-----------------------------------------------------------
+    APIs
+-----------------------------------------------------------
+
+GET /mask?url=URL -> get short url
+
+GET /unmask?hash=URL -> get unmasked url
+
+-----------------------------------------------------------
+    urls.json File Struct
+-----------------------------------------------------------
+
+{"md5sum": "url"}
+
+-----------------------------------------------------------
+    TODO
+-----------------------------------------------------------
+
+- Testcases
+    a. Test out helpers functions.
+    b. Test out API requests.
+
+# describe()
+-> One specific function OR
+-> Group of related functions
+
+# it()
+-> Creates a specific unit test
+
+
+-----------------------------------------------------------
+    Chai
+-----------------------------------------------------------
+
+# Cosmetic Properties
+Chai.js includes cosmetic properties that have no effect on behavior, but instead add natural language to make it clearer for human readers of the code.
+
+Be aware that because cosmetic properties are no-ops, an expectation chain that contains only cosmetic properties will pass.
+
+Chai includes 15 cosmetic properties: to, be, been, is, that, which, and, has, have, with, at, of, same, but, and does.
+
+# Flagging Property
+It sets a flag on the expectation chain. It’s up to the individual assertions to decide how to interpret the flag. Such interpretations can include negations or making the assertion more or less strict.
+
+when not is included in the expectation chain it adds a flag negate: true to the chain
+
+Chai includes 7 flagging properties: not, deep, nested, own, ordered, any, and all
+
+# Method
+A method is an assertion property which takes one or more additional values. This allows the assertion(s) to be customized.
+
+equal, eql, above, below, least, most, within, instanceof, property, ownPropertyDescriptor, lengthOf... etc
+
+-----------------------------------------------------------
+    TDD - URL HIT Analytics
+-----------------------------------------------------------
+
+    function readCount(hash)
+        i. Opens up a JSON File containing masked URLs
+        ii. Looksup hash, if key exists then return counter.
+        iii. Like so
+                if exists maskedURLS[hash]
+                    return maskedURLS[hash]['counter']
+
+on getURL hit, increment a counter.
+
+    function incrementCounter(hash)
+        i.  Opens up a JSON File containing masked URLs
+        ii. Lookups hash, if key exists then counter += 1
+
+        iii. Like so
+                if exists maskedURLS[hash]
+                    maskedURLS[hash]['counter'] += 1
+        iv.  Saves file
+
+My local JSON file
+{
+    "md5": {
+        "url": "http://",
+        "counter": 7
+    }
+}

@@ -51,23 +51,46 @@ async function writeURL(hash, url) {
 
     let data = await readJSONFile(DATABASE);
     console.log(data);
-    data[hash] = url;
+    data[hash] = { url: url, counter: 0 };
 
     await fs.writeFile(DATABASE, JSON.stringify(data));
-    return {md5: hash};
+    return { md5: hash };
 }
 
 async function getURL(hash) {
-    hash = cleanString(hash);
-
-    // if not a valid hash
-    if (!hash)
-        return undefined;
-
-    console.log(`Getting: ${hash}`);
     let data = await readJSONFile(DATABASE);
+
     const url = data[hash];
-    return {url: url};
+    if (!url) {
+        return await {error: 'Invalid hash'};
+    }
+    incrementCounter(hash);
+    return { url: url };
+}
+
+async function readCounter(hash) {
+    hash = hash.trim();
+    const data = await readJSONFile(DATABASE);
+    return data[hash]['counter'];
+}
+
+async function incrementCounter(hash) {
+
+    hash = await cleanString(hash);
+
+    if (!hash) {
+        return { error: 'Invalid hash.' };
+    }
+
+    let data = await readJSONFile(DATABASE);
+
+    if (hash in data) {
+        data[hash]['counter'] += 1;
+        await fs.writeFile(DATABASE, JSON.stringify(data));
+        return { hash: data[hash]['counter'] }
+    } else {
+        return { error: 'Invalid hash.' };
+    }
 }
 
 module.exports = {
@@ -75,5 +98,7 @@ module.exports = {
     md5sum: md5sum,
     readJSONFile: readJSONFile,
     writeURL: writeURL,
-    getURL: getURL
+    getURL: getURL,
+    readCounter: readCounter,
+    incrementCounter: incrementCounter
 }
