@@ -19,8 +19,8 @@ GET /unmask?hash=URL -> get unmasked url
 -----------------------------------------------------------
 
 - Testcases
-    a. Test out helpers functions.
-    b. Test out API requests.
+    a. Test out helpers functions. [X]
+    b. Test out API requests.      [X]
 
 # describe()
 -> One specific function OR

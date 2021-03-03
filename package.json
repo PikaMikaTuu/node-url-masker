@@ -3,13 +3,13 @@
     "express": "^4.17.1"
   },
   "scripts": {
-    "test": "mocha test",
+    "test": "mocha test --exit",
     "coverage": "nyc npm run test"
   },
   "devDependencies": {
     "chai": "^4.3.0",
+    "chai-http": "^4.3.0",
     "mocha": "^8.3.0",
-    "nyc": "^15.1.0",
-    "request": "^2.88.2"
+    "nyc": "^15.1.0"
   }
 }

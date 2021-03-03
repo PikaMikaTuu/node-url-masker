@@ -9,7 +9,7 @@ function cleanString(inputString) {
     // OR
     // typeof inputString is not a string
 
-    if (Boolean(inputString) != true || typeof inputString !== "string" ) {
+    if (Boolean(inputString) != true || typeof inputString !== 'string' ) {
         return undefined;
     }
 
@@ -25,7 +25,7 @@ function md5sum(url) {
     if (!url)
         return undefined;
 
-    const hash = crypto.createHash('md5').update(`${url}`).digest("hex");
+    const hash = crypto.createHash('md5').update(`${url}`).digest('hex');
     return hash;
 }
 
@@ -45,12 +45,11 @@ async function writeURL(hash, url) {
 
     // if not a valid URL or hash
     if (!url || !hash)
-        return undefined;
+        return { error: 'hash / url check failed in helpers/writeURL()' };
 
-    console.log(`Writing: ${hash}: ${url}`);
+    // console.log(`Writing: ${hash}: ${url}`);
 
     let data = await readJSONFile(DATABASE);
-    console.log(data);
     data[hash] = { url: url, counter: 0 };
 
     await fs.writeFile(DATABASE, JSON.stringify(data));
@@ -58,18 +57,30 @@ async function writeURL(hash, url) {
 }
 
 async function getURL(hash) {
-    let data = await readJSONFile(DATABASE);
+    hash = cleanString(hash);
 
-    const url = data[hash];
-    if (!url) {
+    if (!hash) {
         return await {error: 'Invalid hash'};
     }
+
+    let data = await readJSONFile(DATABASE);
+    const url = data[hash];
+
+    if (!url) {
+        return await {error: 'URL Does Not Exist'};
+    }
+
     incrementCounter(hash);
-    return { url: url };
+    return { success: url };
 }
 
 async function readCounter(hash) {
-    hash = hash.trim();
+    hash = cleanString(hash);
+
+    if (!hash) {
+        return await {error: 'Invalid hash'};
+    }
+
     const data = await readJSONFile(DATABASE);
     return data[hash]['counter'];
 }
@@ -93,12 +104,4 @@ async function incrementCounter(hash) {
     }
 }
 
-module.exports = {
-    cleanString: cleanString,
-    md5sum: md5sum,
-    readJSONFile: readJSONFile,
-    writeURL: writeURL,
-    getURL: getURL,
-    readCounter: readCounter,
-    incrementCounter: incrementCounter
-}
+module.exports = { cleanString, md5sum, readJSONFile, writeURL, getURL, readCounter, incrementCounter }

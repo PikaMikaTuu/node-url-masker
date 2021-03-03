@@ -1,192 +1,239 @@
-const expect = require('chai').expect;
-const { md5sum, cleanString, readJSONFile, getURL, writeURL, incrementCounter, readCounter } = require('../helpers.js')
+const chai = require('chai');
+const expect = chai.expect;
 
-describe('the md5sum function', function() {
+// const expect = require('chai').expect;
+const { md5sum, cleanString, getURL, writeURL, readCounter, incrementCounter } = require('../helpers.js')
 
-    it('should calculate md5sum', function() {
-        const googleHash = md5sum('http://google.com');
-        expect(googleHash).to.equal('c7b920f57e553df2bb68272f61570210');
+describe('URL Masker App', function () {
 
-        const yahooHash = md5sum('http://yahoo.com');
-        expect(yahooHash).to.equal('873c87c71f8bf1d15a53ce0c0676971f');
+    describe('the md5sum function', function() {
+        it('should calculate md5sum', function() {
+            const googleHash = md5sum('http://google.com');
+            expect(googleHash).to.equal('c7b920f57e553df2bb68272f61570210');
 
-        const superLongURLHash = md5sum('http://foobarbazfoobarbazfoobarbazfoobarbazfoobarbaz.net?q=xyz&y=pqr');
-        expect(superLongURLHash).to.equal('2eabd3d672470dbe434c709545471f0c');
-    });
-});
+            const yahooHash = md5sum('http://yahoo.com');
+            expect(yahooHash).to.equal('873c87c71f8bf1d15a53ce0c0676971f');
 
-describe('the cleanString function', function() {
-
-    it('should handle empty/null/undefined strings', function() {
-        const emptyResult = cleanString('');
-        expect(emptyResult).to.be.undefined;
-
-        const nullResult = cleanString(null);
-        expect(nullResult).to.be.undefined;
-
-        const undefinedResult = cleanString(undefined);
-        expect(undefinedResult).to.be.undefined;
+            const superLongURLHash = md5sum('http://foobarbazfoobarbazfoobarbazfoobarbazfoobarbaz.net?q=xyz&y=pqr');
+            expect(superLongURLHash).to.equal('2eabd3d672470dbe434c709545471f0c');
+        });
     });
 
-    it('should trim whitespaces from strings', function() {
-        const googleHash = cleanString('   http://google.com          ');
-        expect(googleHash).to.equal('http://google.com');
+    describe('the cleanString function', function() {
+        it('should handle empty/null/undefined strings', function() {
+            const emptyResult = cleanString('');
+            expect(emptyResult).to.be.undefined;
 
-        const yahooHash = cleanString('http://yahoo.com      ');
-        expect(yahooHash).to.equal('http://yahoo.com');
+            const nullResult = cleanString(null);
+            expect(nullResult).to.be.undefined;
 
-        const superLongURLHash = cleanString('        http://foobarbazfoobarbazfoobarbazfoobarbazfoobarbaz.net?q=xyz&y=pqr');
-        expect(superLongURLHash).to.equal('http://foobarbazfoobarbazfoobarbazfoobarbazfoobarbaz.net?q=xyz&y=pqr');
+            const undefinedResult = cleanString(undefined);
+            expect(undefinedResult).to.be.undefined;
+        });
+
+        it('should trim whitespaces from strings', function() {
+            const googleHash = cleanString('   http://google.com          ');
+            expect(googleHash).to.equal('http://google.com');
+
+            const yahooHash = cleanString('http://yahoo.com      ');
+            expect(yahooHash).to.equal('http://yahoo.com');
+
+            const superLongURLHash = cleanString('        http://foobarbazfoobarbazfoobarbazfoobarbazfoobarbaz.net?q=xyz&y=pqr');
+            expect(superLongURLHash).to.equal('http://foobarbazfoobarbazfoobarbazfoobarbazfoobarbaz.net?q=xyz&y=pqr');
+        });
+
+        it('should handle objects other than strings', function() {
+            const numberResult = cleanString(777);
+            expect(numberResult).to.be.undefined;
+
+            const nullResult = cleanString(null);
+            expect(nullResult).to.be.undefined;
+
+            const boolTrueResult = cleanString(true);
+            expect(boolTrueResult).to.be.undefined;
+
+            const boolFalseResult = cleanString(false);
+            expect(boolFalseResult).to.be.undefined;
+
+            const jsonResult = cleanString({'name': 'Foo', 'x': [1, 2, 3]});
+            expect(jsonResult).to.be.undefined;
+        });
     });
 
-    it('should handle objects other than strings', function() {
-        const numberResult = cleanString(777);
-        expect(numberResult).to.be.undefined;
+    // TODO
+    // describe('the readJSONFile function', function() {
+    //     it('should open a valid file', function() {
 
-        const nullResult = cleanString(null);
-        expect(nullResult).to.be.undefined;
+    //     });
 
-        const boolTrueResult = cleanString(true);
-        expect(boolTrueResult).to.be.undefined;
+    //     it('should handle invalid file path', function() {
 
-        const boolFalseResult = cleanString(false);
-        expect(boolFalseResult).to.be.undefined;
+    //     });
 
-        const jsonResult = cleanString({'name': 'Foo', 'x': [1, 2, 3]});
-        expect(jsonResult).to.be.undefined;
-    });
-});
+    //     it('should handle non-JSON files', function() {
 
-// TODO
-// describe('the readJSONFile function', function() {
-//     it('should open a valid file', function() {
+    //     });
 
-//     });
+    //     // should recursively remove ../
+    //     it('should handle directory traversal', function() {
 
-//     it('should handle invalid file path', function() {
+    //     });
+    // });
 
-//     });
+    describe('the getURL function', function() {
+        it('should return a object given a valid hash', async function() {
+            const googleHash = await getURL('c7b920f57e553df2bb68272f61570210');
+            expect(googleHash).to.have.property('success');
+        });
 
-//     it('should handle non-JSON files', function() {
+        it('should return error given an invalid hash', async function() {
+            const nullHash = await getURL(null);
+            expect(nullHash).to.have.property('error');
 
-//     });
+            const undefinedHash = await getURL(undefined);
+            expect(undefinedHash).to.have.property('error');
 
-//     // should recursively remove ../
-//     it('should handle directory traversal', function() {
+            const emptyHash = await getURL('');
+            expect(emptyHash).to.have.property('error');
 
-//     });
-// });
-
-describe('the getURL function', function() {
-
-    it('should return a object given a valid hash', async function() {
-        const googleHash = await getURL('c7b920f57e553df2bb68272f61570210');
-        expect(googleHash).to.have.property('url');
+            const emptySpacesHash = await getURL('          ');
+            expect(emptySpacesHash).to.have.property('error');
+        });
     });
 
-    it('should return error given an invalid hash', async function() {
-        const nullHash = await getURL(null);
-        expect(nullHash).to.have.property('error');
+    describe('the writeURL function', function() {
+        it('should return undefined given undefined/null/empty (hash, url)', async function() {
+            let result;
 
-        const undefinedHash = await getURL(undefined);
-        expect(undefinedHash).to.have.property('error');
+            result = await writeURL('', 'https://foo.bar');
+            expect(result).to.have.property('error');
 
-        const emptyHash = await getURL('');
-        expect(emptyHash).to.have.property('error');
+            result = await writeURL(123, 'https://foo.bar');
+            expect(result).to.have.property('error');
 
-        const emptySpacesHash = await getURL('          ');
-        expect(emptySpacesHash).to.have.property('error');
-    });
-});
+            result = await writeURL([1, 2, 3], 'https://foo.bar');
+            expect(result).to.have.property('error');
 
-describe('the writeURL function', function() {
+            result = await writeURL(null, 'https://foo.bar');
+            expect(result).to.have.property('error');
 
-    it('should return undefined given undefined/null/empty (hash, url)', async function() {
-        let result;
+            result = await writeURL(undefined, 'https://foo.bar');
+            expect(result).to.have.property('error');
 
-        result = await writeURL('', 'https://foo.bar');
-        expect(result).to.be.undefined;
+            result = await writeURL('somevalidhash', '');
+            expect(result).to.have.property('error');
 
-        result = await writeURL(123, 'https://foo.bar');
-        expect(result).to.be.undefined;
+            result = await writeURL('somevalidhash', 123);
+            expect(result).to.have.property('error');
 
-        result = await writeURL([1, 2, 3], 'https://foo.bar');
-        expect(result).to.be.undefined;
+            result = await writeURL('somevalidhash', [1, 2, 3]);
+            expect(result).to.have.property('error');
 
-        result = await writeURL(null, 'https://foo.bar');
-        expect(result).to.be.undefined;
+            result = await writeURL('somevalidhash', null);
+            expect(result).to.have.property('error');
 
-        result = await writeURL(undefined, 'https://foo.bar');
-        expect(result).to.be.undefined;
+            result = await writeURL('somevalidhash', undefined);
+            expect(result).to.have.property('error');
 
-        result = await writeURL('somevalidhash', '');
-        expect(result).to.be.undefined;
-
-        result = await writeURL('somevalidhash', 123);
-        expect(result).to.be.undefined;
-
-        result = await writeURL('somevalidhash', [1, 2, 3]);
-        expect(result).to.be.undefined;
-
-        result = await writeURL('somevalidhash', null);
-        expect(result).to.be.undefined;
-
-        result = await writeURL('somevalidhash', undefined);
-        expect(result).to.be.undefined;
-
-        result = await writeURL('somevalidhash');
-        expect(result).to.be.undefined;
-    });
-});
-
-// returns {md5HashHere: counter} if hash valid.
-// returns {'error': 'invalid hash.'} on if hash not valid.
-describe('the incrementCounter function', function () {
-    it('should increment the counter given a valid hash', async function () {
-
-        let countBeforeIncrement, countAfterIncrement;
-
-        const googleHash = 'c7b920f57e553df2bb68272f61570210';
-        countBeforeIncrement = await readCounter(googleHash);
-        await incrementCounter(googleHash);
-        countAfterIncrement = await readCounter(googleHash);
-        expect(countAfterIncrement - countBeforeIncrement).to.be.equal(1);
-
-
-        const bingHash = '  960976b20dfa5a06f9d1390be46e1858   ';
-        countBeforeIncrement = await readCounter(bingHash);
-        await incrementCounter(bingHash);
-        countAfterIncrement = await readCounter(bingHash);
-        expect(countAfterIncrement - countBeforeIncrement).to.be.equal(1);
-
-
-        const yahooHash = '      873c87c71f8bf1d15a53ce0c0676971f';
-        countBeforeIncrement = await readCounter(yahooHash);
-        await incrementCounter(yahooHash);
-        countAfterIncrement = await readCounter(yahooHash);
-        expect(countAfterIncrement - countBeforeIncrement).to.be.equal(1);
+            result = await writeURL('somevalidhash');
+            expect(result).to.have.property('error');
+        });
     });
 
-    it('should return error if hash not valid', async function () {
-        const doesnotexistCounter = await incrementCounter('thishashdoesnotexist');
-        expect(doesnotexistCounter).to.have.property('error');
+    describe('the incrementCounter function', function () {
+        it('should increment the counter given a valid hash', async function () {
 
-        const invalidTypeCounter1 = await incrementCounter(666);
-        expect(invalidTypeCounter1).to.have.property('error');
+            let countBeforeIncrement, countAfterIncrement;
 
-        const invalidTypeCounter2 = await incrementCounter(null);
-        expect(invalidTypeCounter2).to.have.property('error');
+            const googleHash = 'c7b920f57e553df2bb68272f61570210';
+            countBeforeIncrement = await readCounter(googleHash);
+            await incrementCounter(googleHash);
+            countAfterIncrement = await readCounter(googleHash);
+            expect(countAfterIncrement - countBeforeIncrement).to.be.equal(1);
 
-        const invalidTypeCounter3 = await incrementCounter(undefined);
-        expect(invalidTypeCounter3).to.have.property('error');
 
-        const invalidTypeCounter4 = await incrementCounter([1, 2, 3]);
-        expect(invalidTypeCounter4).to.have.property('error');
+            const bingHash = '  960976b20dfa5a06f9d1390be46e1858   ';
+            countBeforeIncrement = await readCounter(bingHash);
+            await incrementCounter(bingHash);
+            countAfterIncrement = await readCounter(bingHash);
+            expect(countAfterIncrement - countBeforeIncrement).to.be.equal(1);
 
-        const invalidTypeCounter5 = await incrementCounter({'name': 'xyz', 'x': [4, 5, 6]});
-        expect(invalidTypeCounter5).to.have.property('error');
 
-        const invalidTypeCounter6 = await incrementCounter();
-        expect(invalidTypeCounter6).to.have.property('error');
+            const yahooHash = '      873c87c71f8bf1d15a53ce0c0676971f';
+            countBeforeIncrement = await readCounter(yahooHash);
+            await incrementCounter(yahooHash);
+            countAfterIncrement = await readCounter(yahooHash);
+            expect(countAfterIncrement - countBeforeIncrement).to.be.equal(1);
+        });
+
+        it('should return error if hash not valid', async function () {
+            const doesnotexistCounter = await incrementCounter('thishashdoesnotexist');
+            expect(doesnotexistCounter).to.have.property('error');
+
+            const invalidTypeCounter1 = await incrementCounter(666);
+            expect(invalidTypeCounter1).to.have.property('error');
+
+            const invalidTypeCounter2 = await incrementCounter(null);
+            expect(invalidTypeCounter2).to.have.property('error');
+
+            const invalidTypeCounter3 = await incrementCounter(undefined);
+            expect(invalidTypeCounter3).to.have.property('error');
+
+            const invalidTypeCounter4 = await incrementCounter([1, 2, 3]);
+            expect(invalidTypeCounter4).to.have.property('error');
+
+            const invalidTypeCounter5 = await incrementCounter({'name': 'xyz', 'x': [4, 5, 6]});
+            expect(invalidTypeCounter5).to.have.property('error');
+
+            const invalidTypeCounter6 = await incrementCounter();
+            expect(invalidTypeCounter6).to.have.property('error');
+        });
+    });
+
+    describe('the readCounter function', function () {
+        it('should read the counter given a valid hash', async function () {
+            let countBeforeIncrement, countAfterIncrement;
+
+            const googleHash = 'c7b920f57e553df2bb68272f61570210';
+            countBeforeIncrement = await readCounter(googleHash);
+            await incrementCounter(googleHash);
+            countAfterIncrement = await readCounter(googleHash);
+            expect(countAfterIncrement - countBeforeIncrement).to.be.equal(1);
+
+            const yahooHash = '   873c87c71f8bf1d15a53ce0c0676971f   ';
+            countBeforeIncrement = await readCounter(yahooHash);
+            await incrementCounter(yahooHash);
+            countAfterIncrement = await readCounter(yahooHash);
+            expect(countAfterIncrement - countBeforeIncrement).to.be.equal(1);
+        });
+
+        it('should return error given an invalid hash', async function () {
+            const invalidType1 = await readCounter();
+            expect(invalidType1).to.have.property('error');
+
+            const invalidType2 = await readCounter(1);
+            expect(invalidType2).to.have.property('error');
+
+            const invalidType3 = await readCounter('');
+            expect(invalidType3).to.have.property('error');
+
+            const invalidType4 = await readCounter(null);
+            expect(invalidType4).to.have.property('error');
+
+            const invalidType5 = await readCounter(undefined);
+            expect(invalidType5).to.have.property('error');
+
+            const invalidType6 = await readCounter([1, 2, 3]);
+            expect(invalidType6).to.have.property('error');
+
+            const invalidType7 = await readCounter(false);
+            expect(invalidType7).to.have.property('error');
+
+            const invalidType8 = await readCounter(true);
+            expect(invalidType8).to.have.property('error');
+
+            const invalidType9 = await readCounter({ 'name': 'foo', 'x': [1, 2, 3] });
+            expect(invalidType6).to.have.property('error');
+        });
     });
 });

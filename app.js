@@ -29,3 +29,5 @@ app.get('/unmask', async (req, res) => {
 app.listen('8080', () => {
     console.log(`Listening on port ${PORT}`);
 })
+
+module.exports = app; // for testing
